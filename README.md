@@ -1,8 +1,7 @@
 # Exhibit Curator for Art Institute of Chicago 🎨👨‍🎨🖼️
 
 Gillian Nieh & Zacaria Nouri \
-Northwestern University
-\\
+Northwestern University \
 CS 396: Introduction to Web Development \
 Final Project
 
