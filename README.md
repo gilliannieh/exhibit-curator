@@ -1,4 +1,4 @@
-# Exhibit Curator for Art Institute of Chicago
+# Exhibit Curator for Art Institute of Chicago 🎨👨‍🎨🖼️
 
 Gillian Nieh & Zacaria Nouri
 Northwestern University
