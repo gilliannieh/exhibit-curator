@@ -1,0 +1,94 @@
+.my-exhibits {
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.exhibits-container {
+  padding: 60px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.exhibits-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.exhibits-header h1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.exhibits-header p {
+  font-size: 18px;
+  color: #666;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.exhibits-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.empty-state {
+  text-align: center;
+  max-width: 400px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.empty-state h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.empty-state p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 32px;
+  line-height: 1.5;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #333;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.cta-button:hover {
+  background-color: #000;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .exhibits-container {
+    padding: 40px 20px;
+  }
+  
+  .exhibits-header h1 {
+    font-size: 36px;
+  }
+  
+  .exhibits-header p {
+    font-size: 16px;
+  }
+}
