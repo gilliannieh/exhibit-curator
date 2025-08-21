@@ -89,7 +89,7 @@ function MyExhibits() {
                             </div>
 
                             <div className="artwork-info">
-                              <h4 className="artwork-title">{artwork.title}</h4>
+                              <h4 className="exhibit-artwork-title">{artwork.title}</h4>
                               <p className="artwork-artist">{artwork.artist}</p>
                             </div>
                           </div>

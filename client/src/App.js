@@ -151,10 +151,6 @@ function Home() {
     setSelectedPeriod('');
   };
 
-  // if (loading) {
-  //   return <LoadingScreen />;
-  // }
-
   return (
     <div className="App">
       <Navigation currentPage="home" />
@@ -209,12 +205,16 @@ function Home() {
         </div>
       </section>
       
-      {/* Results count */}
-      <div className="results-info" role="status" aria-live="polite">
-        Showing {displayedArtworks.length} artwork{displayedArtworks.length !== 1 ? 's' : ''}
-      </div>
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <>
+          {/* Results count */}
+          <div className="results-info" role="status" aria-live="polite">
+            Showing {displayedArtworks.length} artwork{displayedArtworks.length !== 1 ? 's' : ''}
+          </div>
 
-      <main className="gallery" role="main" aria-label="Artwork gallery">
+          <main className="gallery" role="main" aria-label="Artwork gallery">
         {displayedArtworks.map((artwork) => (
           <article key={artwork.id} className="artwork-card">
             <div className="artwork-image">
@@ -282,6 +282,8 @@ function Home() {
             Click to load 12 additional artworks from the Art Institute of Chicago collection
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

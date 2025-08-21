@@ -353,9 +353,9 @@
   padding: 8px;
 }
 
-.artwork-title {
+.exhibit-artwork-title {
   font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   margin: 0 0 4px 0;
   color: #333;
@@ -391,4 +391,9 @@
   font-family: 'DM Sans', sans-serif;
   text-align: center;
   border-bottom: 1px solid #eee;
+}
+
+/* Utility classes */
+.hidden {
+  display: none !important;
 }

@@ -36,7 +36,7 @@
 
 /* Focus management */
 *:focus {
-  outline: 3px solid #4A90E2;
+  outline: 3px solid #666;
   outline-offset: 2px;
 }
 
@@ -315,7 +315,7 @@ body {
 }
 
 .bookmark-btn:focus {
-  outline: 3px solid #4A90E2;
+  outline: 3px solid #666;
   outline-offset: 2px;
 }
 
