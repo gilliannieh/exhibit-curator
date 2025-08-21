@@ -35,19 +35,18 @@ function MyExhibits() {
   return (
     <div className="my-exhibits">
       <Navigation currentPage="my-exhibits" />
-      
+
       <main className="exhibits-container" role="main">
         <header className="exhibits-header">
           <h1>My Exhibits</h1>
-          
         </header>
-        <button 
+        <button
             className="create-exhibit-btn primary"
             onClick={() => setIsModalOpen(true)}
           >
             + Create New Exhibit
           </button>
-        
+
         <section className="exhibits-content" aria-label="Exhibits content">
           {exhibits.length > 0 ? (
             <div className="exhibits-grid">
@@ -55,7 +54,7 @@ function MyExhibits() {
                 <article key={exhibit.id} className="exhibit-card">
                   <div className="exhibit-card-header">
                     <h2 className="exhibit-title">{exhibit.name}</h2>
-                    <button 
+                    <button
                       className="edit-icon-btn"
                       onClick={() => openEditModal(exhibit)}
                       aria-label={`Edit ${exhibit.name}`}
@@ -64,34 +63,39 @@ function MyExhibits() {
                       <span className="edit-icon">✏️</span>
                     </button>
                   </div>
-                  
+
                   <div className="artwork-preview-area">
                     {exhibit.artworks && exhibit.artworks.length > 0 ? (
                       <div className="artworks-list">
                         {exhibit.artworks.map((artwork) => (
-                          <div key={artwork.id} className="artwork-thumbnail">
-                            {artwork.image_id ? (
-                              <img 
-                                src={getImageUrl(artwork.image_id)} 
-                                alt={artwork.title}
-                                className="artwork-image"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextElementSibling?.style && (e.target.nextElementSibling.style.display = 'flex');
-                                }}
-                              />
-                            ) : (
-                              <div className="no-image artwork-image" role="img" aria-label="No image available">
-                                No Image Available
-                              </div>
-                            )}
+                          <div key={`${exhibit.id}-${artwork.id}`} className="artwork-thumbnail">
+                            <div className="artwork-thumb-media">
+
+                                <>
+                                  <img
+                                    src={getImageUrl(artwork.image_id)}
+                                    alt={artwork.title}
+                                    className="artwork-image"
+                                    loading="lazy"
+                                    onError={(e) => {
+                                      // Hide the broken image and show the fallback block
+                                      e.currentTarget.classList.add('hidden');
+                                      const fb = e.currentTarget.parentElement?.querySelector('.thumb-fallback');
+                                      if (fb) fb.classList.remove('hidden');
+                                    }}
+                                  />
+                                </>
+
+                            </div>
+
                             <div className="artwork-info">
                               <h4 className="artwork-title">{artwork.title}</h4>
                               <p className="artwork-artist">{artwork.artist}</p>
                             </div>
                           </div>
                         ))}
-                        <Link 
+
+                        <Link
                           to="/"
                           className="add-artwork-btn"
                           aria-label={`Add artwork to ${exhibit.name}`}
@@ -101,7 +105,7 @@ function MyExhibits() {
                         </Link>
                       </div>
                     ) : (
-                      <Link 
+                      <Link
                         to="/"
                         className="add-artwork-btn empty"
                         aria-label={`Add artwork to ${exhibit.name}`}
@@ -116,7 +120,7 @@ function MyExhibits() {
               ))}
             </div>
           ) : (
-            <div className="empty-state">
+            <div className="empty-state" aria-live="polite">
               <div className="empty-icon">🎨</div>
               <h2>No exhibits yet</h2>
               <p>Start curating your first exhibit by creating a collection and adding artworks.</p>
@@ -124,7 +128,7 @@ function MyExhibits() {
           )}
         </section>
       </main>
-      
+
       <ExhibitModal
         isOpen={isModalOpen}
         onClose={closeModal}
