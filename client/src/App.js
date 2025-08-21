@@ -2,7 +2,11 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import Navigation from './components/Navigation';
+import LoadingScreen from './components/LoadingScreen';
+import ExhibitSelector from './components/ExhibitSelector';
 import MyExhibits from './pages/MyExhibits';
+import { ExhibitProvider } from './context/ExhibitContext';
+import { determinePeriod, getImageUrl, delay, fallbackArtworkData, fallbackPeriods } from './scripts/utils';
 
 function Home() {
   const [allArtworks, setAllArtworks] = useState([]);
@@ -11,6 +15,7 @@ function Home() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedArtwork, setSelectedArtwork] = useState(null);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,34 +71,11 @@ function Home() {
       console.error('API Error:', err);
       if (!append) {
         // Fallback to sample data only on initial load
-        const fallbackData = [
-          { id: 1, title: "Title of Artwork", artist: "First Last", year: "XXXX", period: "Modern", tags: ["PERIOD", "POPULAR"], image_id: null },
-          { id: 2, title: "Another Artwork", artist: "Artist Name", year: "YYYY", period: "Contemporary", tags: ["STYLE", "FEATURED"], image_id: null },
-          { id: 3, title: "Third Piece", artist: "Famous Artist", year: "ZZZZ", period: "Classical", tags: ["HISTORIC", "RARE"], image_id: null }
-        ];
-        setAllArtworks(fallbackData);
-        setAvailablePeriods(['Modern', 'Contemporary', 'Classical']);
+        setAllArtworks(fallbackArtworkData);
+        setAvailablePeriods(fallbackPeriods);
       }
     }
   }, []);
-
-  // Function to determine period based on date and style
-  const determinePeriod = (dateStart, dateEnd, styleTitles) => {
-    if (styleTitles && styleTitles.length > 0) {
-      return styleTitles[0];
-    }
-    
-    const year = dateStart || dateEnd;
-    if (!year) return 'Unknown Period';
-    
-    if (year < 1400) return 'Medieval';
-    if (year < 1600) return 'Renaissance';
-    if (year < 1750) return 'Baroque';
-    if (year < 1850) return 'Neoclassical';
-    if (year < 1900) return 'Impressionist';
-    if (year < 1945) return 'Modern';
-    return 'Contemporary';
-  };
 
   // Filter artworks based on search and filters
   useEffect(() => {
@@ -118,8 +100,35 @@ function Home() {
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      await fetchArtworks(1);
-      setLoading(false);
+      
+      // Record start time for minimum loading duration
+      const startTime = Date.now();
+      const minimumLoadingTime = 4000; // 4 seconds
+      
+      try {
+        // Fetch the artworks
+        await fetchArtworks(1);
+        
+        // Calculate how much time has passed
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = minimumLoadingTime - elapsedTime;
+        
+        // If we need to wait longer to reach minimum time, do so
+        if (remainingTime > 0) {
+          await delay(remainingTime);
+        }
+        
+      } catch (error) {
+        console.error('Error loading artworks:', error);
+        // Even on error, wait the minimum time for consistent UX
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = minimumLoadingTime - elapsedTime;
+        if (remainingTime > 0) {
+          await delay(remainingTime);
+        }
+      } finally {
+        setLoading(false);
+      }
     };
     
     loadInitialData();
@@ -142,85 +151,102 @@ function Home() {
     setSelectedPeriod('');
   };
 
-  // Function to construct IIIF image URL
-  const getImageUrl = (imageId) => {
-    if (!imageId) return null;
-    return `https://www.artic.edu/iiif/2/${imageId}/full/843,/0/default.jpg`;
-  };
-
-  if (loading) {
-    return (
-      <div className="App">
-        <Navigation currentPage="home" />
-        <main className="gallery">
-          <div style={{ textAlign: 'center', padding: '2rem', gridColumn: '1 / -1' }}>
-            Loading artworks...
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return <LoadingScreen />;
+  // }
 
   return (
     <div className="App">
       <Navigation currentPage="home" />
       
       {/* Filter Controls */}
-      <div className="filter-controls">
+      <section className="filter-controls" aria-label="Search and filter artworks">
         <div className="search-bar">
+          <label htmlFor="artwork-search" className="visually-hidden">
+            Search artworks by title, artist, or period
+          </label>
           <input
+            id="artwork-search"
             type="text"
             placeholder="Search by title, artist, or period..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
+            aria-describedby="search-help"
           />
+          <div id="search-help" className="visually-hidden">
+            Enter keywords to search through artwork titles, artists, and time periods
+          </div>
           
+          <label htmlFor="period-filter" className="visually-hidden">
+            Filter by time period
+          </label>
           <select
+            id="period-filter"
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
             className="filter-select"
+            aria-describedby="period-help"
           >
             <option value="">All Periods</option>
             {availablePeriods.map((period, index) => (
               <option key={index} value={period}>{period}</option>
             ))}
           </select>
+          <div id="period-help" className="visually-hidden">
+            Choose a specific time period to filter artworks
+          </div>
           
           {(searchTerm || selectedPeriod) && (
-            <button onClick={clearFilters} className="clear-filters-btn">
+            <button 
+              onClick={clearFilters} 
+              className="clear-filters-btn"
+              aria-label="Clear all search filters and show all artworks"
+            >
               Clear Filters
             </button>
           )}
         </div>
-      </div>
+      </section>
       
       {/* Results count */}
-      <div className="results-info">
+      <div className="results-info" role="status" aria-live="polite">
         Showing {displayedArtworks.length} artwork{displayedArtworks.length !== 1 ? 's' : ''}
       </div>
 
-      <main className="gallery">
+      <main className="gallery" role="main" aria-label="Artwork gallery">
         {displayedArtworks.map((artwork) => (
-          <div key={artwork.id} className="artwork-card">
+          <article key={artwork.id} className="artwork-card">
             <div className="artwork-image">
               {artwork.image_id ? (
                 <img 
                   src={getImageUrl(artwork.image_id)} 
-                  alt={artwork.title}
+                  alt={`${artwork.title} by ${artwork.artist}, ${artwork.year}`}
                   onError={(e) => {
                     e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'flex';
                   }}
                 />
               ) : (
-                <div className="no-image">No Image Available</div>
+                <div className="no-image" role="img" aria-label="No image available">
+                  No Image Available
+                </div>
               )}
-              <button className="bookmark-btn">+</button>
+              <div className="bookmark-container">
+                <button 
+                  className="bookmark-btn"
+                  onClick={() => setSelectedArtwork(selectedArtwork?.id === artwork.id ? null : artwork)}
+                  aria-label={`Add ${artwork.title} to my exhibits`}
+                  title="Add to My Exhibits"
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="artwork-info">
               <h3 className="artwork-title">{artwork.title}</h3>
               <p className="artwork-meta">{artwork.artist} • {artwork.year}</p>
-              <div className="artwork-tags">
+              <div className="artwork-tags" aria-label="Artwork categories">
                 {artwork.tags.map((tag, index) => (
                   <span key={index} className={`tag ${tag.toLowerCase().replace(/\s+/g, '-')}`}>
                     {tag.toUpperCase()}
@@ -228,9 +254,17 @@ function Home() {
                 ))}
               </div>
             </div>
-          </div>
+          </article>
         ))}
       </main>
+      
+      {/* Render ExhibitSelector as a modal overlay at the top level */}
+      {selectedArtwork && (
+        <ExhibitSelector 
+          artwork={selectedArtwork}
+          onClose={() => setSelectedArtwork(null)}
+        />
+      )}
       
       {/* Load More Button */}
       {hasMore && !searchTerm && !selectedPeriod && (
@@ -239,9 +273,14 @@ function Home() {
             onClick={loadMore} 
             disabled={loadingMore}
             className="load-more-btn"
+            aria-label={loadingMore ? 'Loading more artworks' : 'Load more artworks'}
+            aria-describedby="load-more-help"
           >
             {loadingMore ? 'Loading...' : 'Load More'}
           </button>
+          <div id="load-more-help" className="visually-hidden">
+            Click to load 12 additional artworks from the Art Institute of Chicago collection
+          </div>
         </div>
       )}
     </div>
@@ -250,12 +289,14 @@ function Home() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/my-exhibits" element={<MyExhibits />} />
-      </Routes>
-    </Router>
+    <ExhibitProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/my-exhibits" element={<MyExhibits />} />
+        </Routes>
+      </Router>
+    </ExhibitProvider>
   );
 }
 

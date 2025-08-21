@@ -1,3 +1,62 @@
+/* Accessibility utilities */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .nav-item,
+  .search-input,
+  .filter-select,
+  .clear-filters-btn,
+  .load-more-btn {
+    border: 2px solid !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus management */
+*:focus {
+  outline: 3px solid #4A90E2;
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -182,32 +241,33 @@ body {
   gap: 30px;
   max-width: 1400px;
   margin: 0 auto;
+  align-items: start;
 }
 
 .artwork-card {
   background: white;
-  border-radius: 0;
-  overflow: hidden;
-  padding: 12px;
+  border-radius: 6px;
+  overflow: visible;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  box-shadow: none;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              border 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.artwork-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .artwork-image {
   width: 100%;
-  height: 200px;
+  height: 220px;
   background-color: #c0c0c0;
+  border-radius: 4px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .artwork-image img {
@@ -224,30 +284,46 @@ body {
   font-family: 'IBM Plex Mono', monospace;
 }
 
-.bookmark-btn {
+.bookmark-container {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+  z-index: 10;
+}
+
+.bookmark-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  color: #666;
+  font-size: 14px;
+  color: #333;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  z-index: 1;
 }
 
 .bookmark-btn:hover {
-  background: white;
-  color: #333;
+  background: rgba(255, 255, 255, 1);
+  border-color: #333;
+  transform: scale(1.1);
+}
+
+.bookmark-btn:focus {
+  outline: 3px solid #4A90E2;
+  outline-offset: 2px;
 }
 
 .artwork-info {
-  padding: 16px 0;
+  padding: 16px 12px 12px 12px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .artwork-title {

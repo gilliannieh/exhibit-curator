@@ -4,7 +4,7 @@ import '@fontsource/dm-sans';
 import '@fontsource/ibm-plex-mono';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from './scripts/reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
